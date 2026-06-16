@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Isha Volunteers Portal — North America</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#12174a;--bg2:#0e1340;--bg3:#0a0f35;
+  --card:#1c2258;--card2:#161b50;
+  --amber:#f0a500;--amber2:#c98a00;
+  --amberbg:rgba(240,165,0,0.10);--amberbg2:rgba(240,165,0,0.06);
+  --amberborder:rgba(240,165,0,0.22);--amberborder2:rgba(240,165,0,0.38);
+  --text:#e8eaf6;--text2:#9fa8c9;--text3:#5a6399;
+  --border:rgba(240,165,0,0.16);--border2:rgba(240,165,0,0.28);
+  --green:#3ed28a;--blue:#6aaff7;--pink:#e87bb8;
+  --r:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+
+/* TOP BAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.logo{width:36px;height:36px;border-radius:8px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-inner{width:14px;height:14px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;}
+.logo-dot{width:5px;height:5px;border-radius:50%;background:var(--amber);}
+.portal-name{font-size:15px;font-weight:600;color:var(--text);}
+.portal-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.topbar-right{margin-left:auto;text-align:right;}
+.reach-num{font-size:17px;font-weight:700;color:var(--amber);line-height:1;}
+.reach-lbl{font-size:10px;color:var(--text3);}
+
+/* STATES */
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--amber);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:13px;color:var(--text3);}
+#error-box{display:none;margin:40px 20px;background:rgba(226,75,74,0.1);border:1px solid rgba(226,75,74,0.3);border-radius:var(--r);padding:20px;text-align:center;}
+#error-box p{font-size:13px;color:#f09595;line-height:1.6;}
+
+/* VOL CHIP */
+.vol-chip{display:flex;align-items:center;gap:10px;margin:14px 16px 0;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--amberbg);border:1.5px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--amber);flex-shrink:0;}
+.vol-name{font-size:13px;font-weight:600;color:var(--text);}
+.vol-meta{font-size:11px;color:var(--text3);}
+.vol-reach{margin-left:auto;text-align:right;}
+.vol-reach-num{font-size:16px;font-weight:700;color:var(--amber);}
+.vol-reach-lbl{font-size:10px;color:var(--text3);}
+
+/* NAV */
+.nav-outer{background:var(--bg3);border-bottom:2px solid rgba(255,255,255,0.06);margin-top:14px;overflow-x:auto;scrollbar-width:none;}
+.nav-outer::-webkit-scrollbar{display:none;}
+.nav-tabs{display:flex;padding:0 16px;min-width:max-content;}
+.nav-tab{padding:11px 14px;font-size:12px;font-weight:600;color:#c8cfe8;cursor:pointer;border:none;border-bottom:3px solid transparent;background:transparent;white-space:nowrap;margin-bottom:-2px;letter-spacing:0.01em;transition:color .15s;}
+.nav-tab:hover{color:#fff;}
+.nav-tab.active{color:var(--amber) !important;border-bottom-color:var(--amber) !important;}
+
+/* CONTENT */
+.content{padding:16px;}
+.section{display:none;}
+.section.active{display:block;}
+.sec-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.sec-desc{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:14px;}
+
+/* STORY CARD */
+.story-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;transition:border-color .15s;}
+.story-card:hover{border-color:var(--border2);}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.card-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;}
+.card-hook{font-size:12px;color:var(--text2);line-height:1.55;font-style:italic;margin-bottom:8px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.tag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:0.03em;}
+.tag-section{background:var(--amberbg);color:var(--amber);border:1px solid var(--amberborder);}
+.tag-li{background:rgba(10,102,194,0.15);color:var(--blue);border:1px solid rgba(10,102,194,0.3);}
+.tag-ig{background:rgba(193,53,132,0.12);color:var(--pink);border:1px solid rgba(193,53,132,0.25);}
+.tag-fb{background:rgba(24,119,242,0.12);color:#72aaf7;border:1px solid rgba(24,119,242,0.25);}
+.tag-x{background:rgba(200,200,220,0.08);color:var(--text2);border:1px solid rgba(200,200,220,0.18);}
+
+/* EXPAND BTN */
+.expand-btn{font-size:11px;font-weight:600;color:var(--amber);background:var(--amberbg2);border:1px solid var(--amberborder);border-radius:6px;padding:4px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.expand-btn:hover{background:var(--amberbg);}
+
+/* CAPTION PANEL */
+.caption-panel{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.caption-panel.open{display:block;}
+.cap-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
+
+/* PLATFORM ROWS */
+.plat-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;}
+.plat-tag{min-width:72px;text-align:center;flex-shrink:0;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;margin-top:2px;}
+.pt-li{background:rgba(10,102,194,0.15);color:var(--blue);}
+.pt-ig{background:rgba(193,53,132,0.12);color:var(--pink);}
+.pt-fb{background:rgba(24,119,242,0.12);color:#72aaf7;}
+.pt-x{background:rgba(200,200,220,0.08);color:var(--text2);}
+.cap-wrap{flex:1;}
+.cap-text{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:6px;white-space:pre-wrap;word-break:break-word;}
+.cap-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.copy-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--amberbg2);color:var(--amber);}
+.copy-btn:hover{background:var(--amberbg);}
+.copy-btn.copied{background:rgba(62,210,138,0.12);color:var(--green);border-color:rgba(62,210,138,0.25);}
+.open-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.open-btn:hover{opacity:0.8;}
+.obtn-li{background:rgba(10,102,194,0.15);color:var(--blue);border-color:rgba(10,102,194,0.3);}
+.obtn-ig{background:rgba(193,53,132,0.12);color:var(--pink);border-color:rgba(193,53,132,0.25);}
+.obtn-fb{background:rgba(24,119,242,0.12);color:#72aaf7;border-color:rgba(24,119,242,0.25);}
+.obtn-x{background:rgba(200,200,220,0.08);color:var(--text2);border-color:rgba(200,200,220,0.18);}
+
+/* FLYER CARD */
+.flyer-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;}
+.flyer-card:hover{border-color:var(--border2);}
+.flyer-img{width:100%;max-height:220px;object-fit:cover;display:block;}
+.flyer-placeholder{width:100%;height:140px;background:linear-gradient(135deg,var(--bg3),var(--card2));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-bottom:1px solid var(--border);}
+.flyer-placeholder-icon{font-size:30px;opacity:0.35;}
+.flyer-placeholder-text{font-size:11px;color:var(--text3);}
+.flyer-body{padding:12px 14px;}
+.flyer-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.flyer-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;}
+.flyer-meta{font-size:11px;color:var(--text3);margin-top:3px;}
+.dl-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--bg2);background:var(--amber);border:none;border-radius:7px;padding:6px 12px;cursor:pointer;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.dl-btn:hover{background:var(--amber2);}
+.reg-link{font-size:11px;color:var(--amber);display:inline-flex;align-items:center;gap:4px;text-decoration:none;margin-top:8px;}
+.reg-link:hover{color:#fff;}
+
+/* QUOTE CARD */
+.quote-card{border-left:3px solid var(--amber);background:var(--card2);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:10px;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.quote-text{font-size:13px;color:var(--text);font-style:italic;line-height:1.6;}
+.quote-attr{font-size:11px;color:var(--amber);margin-top:5px;font-weight:600;}
+.quote-sub{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;}
+
+/* TIP */
+.tip{display:flex;align-items:flex-start;gap:8px;background:var(--amberbg2);border:1px solid var(--amberborder);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* MOM */
+.mom-hero{background:linear-gradient(135deg,#0d2a1e,var(--bg));border:1px solid var(--amberborder2);border-radius:var(--r);padding:18px;margin-bottom:14px;text-align:center;}
+.mom-logo{font-size:22px;font-weight:700;color:var(--amber);letter-spacing:0.04em;margin-bottom:4px;}
+.mom-tag{font-size:12px;color:var(--text2);}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.stat-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;}
+.stat-num{font-size:20px;font-weight:700;color:var(--amber);}
+.stat-lbl{font-size:10px;color:var(--text3);margin-top:2px;}
+
+/* MISC */
+.divlbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin:14px 0 8px;display:flex;align-items:center;gap:6px;}
+.divlbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;line-height:1.6;}
+.footer{text-align:center;padding:24px 16px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:20px;}
+
+@media(max-width:480px){
+  .topbar{padding:10px 14px;}
+  .content{padding:12px;}
+  .cap-actions{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-inner"><div class="logo-dot"></div></div></div>
+  <div>
+    <div class="portal-name">Isha Volunteers Portal</div>
+    <div class="portal-sub">North America · Inner Engineering community</div>
+  </div>
+  <div class="topbar-right">
+    <div class="reach-num" id="total-stories">—</div>
+    <div class="reach-lbl">stories ready</div>
+  </div>
+</div>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Loading stories…</div>
+</div>
+
+<div id="error-box">
+  <p id="error-msg"></p>
+  <p style="margin-top:10px;font-size:12px;color:var(--text3);">Make sure WORKER_URL in index.html points to your deployed Cloudflare Worker.</p>
+</div>
+
+<div id="main" style="display:none;">
+
+  <div class="vol-chip">
+    <div class="avatar">IV</div>
+    <div>
+      <div class="vol-name">Isha Volunteer</div>
+      <div class="vol-meta" id="vol-meta">North America · sharing wisdom</div>
+    </div>
+    <div class="vol-reach">
+      <div class="vol-reach-num" id="vol-count">0</div>
+      <div class="vol-reach-lbl">stories live</div>
+    </div>
+  </div>
+
+  <div class="nav-outer">
+    <div class="nav-tabs" id="nav-tabs">
+      <button class="nav-tab active" data-sec="sadhguru">Sadhguru &amp; Isha</button>
+      <button class="nav-tab" data-sec="quotes">Daily quotes</button>
+      <button class="nav-tab" data-sec="personal">Personal sharings</button>
+      <button class="nav-tab" data-sec="programs">Upcoming programs</button>
+      <button class="nav-tab" data-sec="free">Free events</button>
+      <button class="nav-tab" data-sec="mom">Miracle of Mind</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section active" id="sec-sadhguru">
+      <div class="sec-title">Amplify official Sadhguru &amp; Isha content</div>
+      <div class="sec-desc">Reshare from official handles with one personal line. Your voice makes it land differently than an org post.</div>
+      <div class="tip">💡 <span>Tag: Instagram <strong>@sadhguru</strong> &amp; <strong>@isha.foundation</strong> · Facebook <strong>Sadhguru</strong> &amp; <strong>Isha Foundation</strong> · X <strong>@SadhguruJV</strong> · LinkedIn <strong>Sadhguru</strong></span></div>
+      <div id="list-sadhguru"><div class="empty">Loading…</div></div>
+    </div>
+
+    <div class="section" id="sec-quotes">
+      <div class="sec-title">Daily Sadhguru quotes</div>
+      <div class="sec-desc">Best for Instagram, Facebook, and X. Add one personal line before posting — it's the difference between broadcasting and connecting.</div>
+      <div id="list-quotes"><div class="empty">Loading…</div></div>
+    </div>
+
+    <div class="section" id="sec-personal">
+      <div class="sec-title">Personal sharings — your story, your voice</div>
+      <div class="sec-desc">The most powerful content we can share. Real experiences with IE and the practices.</div>
+      <div class="tip">💡 <span>Lead with the problem, not the practice. "I couldn't sleep" lands better than "I started meditating."</span></div>
+      <div id="list-personal"><div class="empty">Loading…</div></div>
+    </div>
+
+    <div class="section" id="sec-programs">
+      <div class="sec-title">Upcoming programs — Toronto &amp; GTA</div>
+      <div class="sec-desc">Download the flyer, pick your platform, copy the caption. Three steps to share any program in under a minute.</div>
+      <div class="tip">⭐ <span><strong>Caption formula:</strong> Your result → what the program is → dates → soft invite. Never lead with the price.</span></div>
+      <div id="list-programs"><div class="empty">Loading…</div></div>
+    </div>
+
+    <div class="section" id="sec-free">
+      <div class="sec-title">Free programs &amp; events — GTA upcoming</div>
+      <div class="sec-desc">Zero-barrier entry points. Easiest ask you can make — no cost, no commitment.</div>
+      <div class="tip">👤 <span>Tag one specific person: "Marcus, this one's near you." Personal invites convert far better than open posts.</span></div>
+      <div id="list-free"><div class="empty">Loading…</div></div>
+    </div>
+
+    <div class="section" id="sec-mom">
+      <div class="mom-hero">
+        <div class="mom-logo">Miracle of Mind</div>
+        <div class="mom-tag">GTA community · built on Inner Engineering · six regions across Toronto</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num">10k</div><div class="stat-lbl">members</div></div>
+        <div class="stat-card"><div class="stat-num">6</div><div class="stat-lbl">GTA regions</div></div>
+        <div class="stat-card"><div class="stat-num">~30</div><div class="stat-lbl">volunteers</div></div>
+      </div>
+      <div class="sec-desc">Share our community's story — the offline gatherings, the local impact, and what real connection feels like in a city of digital noise.</div>
+      <div id="list-mom"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="footer">Isha Volunteers Portal · North America · Built with ❤️ by the Toronto community</div>
+</div>
+
+<script>
+// ─── STEP 1: Replace this with your Cloudflare Worker URL after deploying ───
+const WORKER_URL = 'https://isha-portal-proxy.gsr-contact.workers.dev';
+// ────────────────────────────────────────────────────────────────────────────
+
+const STORIES_TABLE = 'Stories';
+
+const SECTION_MAP = {
+  'Sadhguru & Isha':   'sadhguru',
+  'Daily quote':       'quotes',
+  'Personal sharings': 'personal',
+  'Upcoming programs': 'programs',
+  'Free events':       'free',
+  'Miracle of Mind':   'mom',
+};
+
+const CAP_FIELDS = {
+  LinkedIn:  'Caption \u2014 LinkedIn',
+  Instagram: 'Caption \u2014 Instagram',
+  Facebook:  'Caption \u2014 Facebook',
+  X:         'Caption \u2014 X',
+};
+
+const PLAT_TAG_CLS  = {LinkedIn:'pt-li',Instagram:'pt-ig',Facebook:'pt-fb',X:'pt-x'};
+const PLAT_OPEN_CLS = {LinkedIn:'obtn-li',Instagram:'obtn-ig',Facebook:'obtn-fb',X:'obtn-x'};
+const TAG_CLS       = {LinkedIn:'tag-li',Instagram:'tag-ig',Facebook:'tag-fb',X:'tag-x'};
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function deepLink(platform, text, url) {
+  const t = encodeURIComponent(text);
+  const u = encodeURIComponent(url || '');
+  switch(platform) {
+    case 'LinkedIn':  return `https://www.linkedin.com/sharing/share-offsite/?url=${u}&summary=${t}`;
+    case 'Facebook':  return `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`;
+    case 'X':         return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text+(url?'\n'+url:''))}`;
+    default:          return null;
+  }
+}
+
+window.copyText = function(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2200);
+  }).catch(() => { btn.textContent = 'Select & copy manually'; });
+};
+
+window.togglePanel = function(id, btn) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
+  btn.textContent = el.classList.contains('open') ? 'Close' : btn.dataset.orig;
+};
+
+function buildPlatRows(fields, utmLink) {
+  const platforms = fields['Platforms'] || [];
+  return platforms.map(p => {
+    const cap = fields[CAP_FIELDS[p]] || '';
+    if (!cap) return '';
+    const safeId  = 'r' + Math.random().toString(36).slice(2);
+    const dl      = deepLink(p, cap, utmLink || '');
+    const openBtn = p === 'Instagram'
+      ? `<button class="copy-btn" onclick="copyText(this,${JSON.stringify(cap)})">Copy for Instagram</button>`
+      : dl ? `<a class="open-btn ${PLAT_OPEN_CLS[p]}" href="${esc(dl)}" target="_blank" rel="noopener">↗ Open ${p}</a>` : '';
+    return `
+      <div class="plat-row">
+        <span class="plat-tag ${PLAT_TAG_CLS[p]}">${p}</span>
+        <div class="cap-wrap">
+          <div class="cap-text">${esc(cap)}</div>
+          <div class="cap-actions">
+            <button class="copy-btn" onclick="copyText(this,${JSON.stringify(cap)})">Copy</button>
+            ${openBtn}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function buildStoryCard(r) {
+  const f       = r.fields;
+  const title   = f['Story title'] || 'Untitled';
+  const hook    = f['Resonance hook'] || '';
+  const section = f['Content section'] || '';
+  const platags = (f['Platforms']||[]).map(p=>`<span class="tag ${TAG_CLS[p]||'tag-section'}">${p}</span>`).join('');
+  const utmLink = f['UTM link'] || '';
+  const atts    = f['Visual asset'] || [];
+  const panelId = 'p-' + r.id;
+  const rows    = buildPlatRows(f, utmLink);
+  const imgHtml = atts.length
+    ? `<img src="${esc(atts[0].thumbnails?.large?.url||atts[0].url)}" alt="${esc(title)}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px 8px 0 0;display:block;" loading="lazy"/>`
+    : '';
+  return `
+    <div class="story-card">
+      ${imgHtml}
+      <div class="card-top">
+        <div>
+          <div class="card-title">${esc(title)}</div>
+          <div class="tag-row"><span class="tag tag-section">${esc(section)}</span>${platags}</div>
+        </div>
+        ${rows ? `<button class="expand-btn" onclick="togglePanel('${panelId}',this)">Captions</button>` : ''}
+      </div>
+      ${hook ? `<div class="card-hook">"${esc(hook)}"</div>` : ''}
+      ${rows ? `
+        <div class="caption-panel" id="${panelId}">
+          <div class="cap-lbl">Choose platform — copy &amp; share</div>
+          ${rows}
+          ${utmLink ? `<a class="reg-link" href="${esc(utmLink)}" target="_blank" rel="noopener">↗ Link / registration</a>` : ''}
+        </div>` : ''}
+    </div>`;
+}
+
+function buildFlyerCard(r) {
+  const f       = r.fields;
+  const title   = f['Story title'] || 'Untitled';
+  const hook    = f['Resonance hook'] || '';
+  const utmLink = f['UTM link'] || '';
+  const atts    = f['Visual asset'] || [];
+  const panelId = 'p-' + r.id;
+  const rows    = buildPlatRows(f, utmLink);
+  const imgHtml = atts.length
+    ? `<img class="flyer-img" src="${esc(atts[0].thumbnails?.large?.url||atts[0].url)}" alt="${esc(title)}" loading="lazy"/>`
+    : `<div class="flyer-placeholder"><div class="flyer-placeholder-icon">🖼️</div><div class="flyer-placeholder-text">Upload flyer in Airtable Visual asset field</div></div>`;
+  const dlBtn = atts.length
+    ? `<a class="dl-btn" href="${esc(atts[0].url)}" download="${esc(title)}.jpg" target="_blank">⬇ Flyer</a>`
+    : '';
+  return `
+    <div class="flyer-card">
+      ${imgHtml}
+      <div class="flyer-body">
+        <div class="flyer-title-row">
+          <div>
+            <div class="flyer-name">${esc(title)}</div>
+            ${hook ? `<div class="flyer-meta">${esc(hook)}</div>` : ''}
+          </div>
+          ${dlBtn}
+        </div>
+        ${rows ? `
+          <div class="caption-panel open" id="${panelId}">
+            <div class="cap-lbl">Captions — copy &amp; share</div>
+            ${rows}
+          </div>` : ''}
+        ${utmLink ? `<a class="reg-link" href="${esc(utmLink)}" target="_blank" rel="noopener">↗ Registration page</a>` : ''}
+      </div>
+    </div>`;
+}
+
+function buildQuoteCard(r) {
+  const f       = r.fields;
+  const title   = f['Story title'] || '';
+  const hook    = f['Resonance hook'] || '';
+  const panelId = 'p-' + r.id;
+  const rows    = buildPlatRows(f, '');
+  return `
+    <div class="quote-card">
+      <div class="quote-text">${esc(title)}</div>
+      <div class="quote-attr">— Sadhguru</div>
+      ${hook ? `<div class="quote-sub">${esc(hook)}</div>` : ''}
+      ${rows ? `
+        <button class="expand-btn" style="margin-top:10px;" onclick="togglePanel('${panelId}',this)">Caption ideas</button>
+        <div class="caption-panel" id="${panelId}">
+          <div class="cap-lbl">Choose platform</div>
+          ${rows}
+        </div>` : ''}
+    </div>`;
+}
+
+function renderSection(key, records) {
+  const el = document.getElementById('list-' + key);
+  if (!el) return;
+  if (!records.length) {
+    el.innerHTML = `<div class="empty">No stories in this section yet.<br>Add them in Airtable and set Status to Live.</div>`;
+    return;
+  }
+  if (key === 'quotes')   { el.innerHTML = records.map(buildQuoteCard).join(''); return; }
+  if (key === 'programs') { el.innerHTML = records.map(buildFlyerCard).join(''); return; }
+  el.innerHTML = records.map(buildStoryCard).join('');
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+document.getElementById('nav-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.nav-tab');
+  if (!tab) return;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  tab.classList.add('active');
+  const sec = document.getElementById('sec-' + tab.dataset.sec);
+  if (sec) sec.classList.add('active');
+});
+
+// ─── FETCH & INIT ─────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const workerReady = WORKER_URL && !WORKER_URL.includes('REPLACE-WITH-YOUR-WORKER');
+    if (!workerReady) throw new Error('Worker URL not set. Open index.html and replace WORKER_URL with your Cloudflare Worker URL.');
+
+    const url = `${WORKER_URL}?table=${encodeURIComponent(STORIES_TABLE)}&filter={Status}="Live"`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Worker returned HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    const records = data.records || [];
+
+    // Group by section
+    const grouped = {};
+    Object.values(SECTION_MAP).forEach(k => grouped[k] = []);
+    records.forEach(r => {
+      const key = SECTION_MAP[r.fields['Content section'] || ''];
+      if (key) grouped[key].push(r);
+    });
+
+    Object.entries(grouped).forEach(([k, recs]) => renderSection(k, recs));
+
+    document.getElementById('vol-count').textContent = records.length;
+    document.getElementById('vol-meta').textContent = `North America · ${records.length} stories ready to share`;
+    document.getElementById('total-stories').textContent = records.length;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-msg').textContent = e.message;
+    document.getElementById('error-box').style.display = 'block';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
